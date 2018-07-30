@@ -98,6 +98,19 @@ def alfred_items_for_value(value):
     ))
     index += 1
 
+    # Add ISO 8601 UTC
+    item_value = utcnow().datetime.strftime("%Y-%m-%dT%H:%M:%SZ")
+    results.append(alfred.Item(
+        title=str(item_value),
+        subtitle='ISO 8601 (UTC)',
+        attributes={
+            'uid': alfred.uid(index),
+            'arg': item_value,
+        },
+    icon='icon.png',
+    ))
+    index += 1
+
     # Various formats
     formats = [
         # Sun, 19 May 2002 15:21:36
