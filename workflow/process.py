@@ -4,6 +4,7 @@ import re
 import operator
 import alfred
 import calendar
+import time
 from dateutil.tz import tzlocal
 from datetime import datetime
 from delorean import utcnow, parse, epoch
@@ -33,7 +34,7 @@ def parse_query_value(query_str):
             try:
                 if query_str.isdigit() and len(query_str) == 13:
                     query_str = query_str[:10] + '.' + query_str[10:]
-                d = epoch(float(query_str))
+                d = epoch(float(query_str)).datetime
             except ValueError:
                 d = parse(str(query_str))
     except (TypeError, ValueError):
@@ -111,12 +112,25 @@ def alfred_items_for_value(value):
     ))
     index += 1
 
+    # Local Time Hack
+    almost_time = datetime.fromtimestamp(unixtime)
+    localtime = almost_time.replace(tzinfo=tzlocal())
+    item_value = localtime.strftime("%Y-%m-%dT%H:%M:%S%z")
+    results.append(alfred.Item(
+        title=str(item_value),
+        subtitle='ISO 8601 (Local)',
+        attributes={
+            # 'uid': alfred.uid(index),
+            'arg': item_value,
+        },
+    icon='icon.png',
+    ))
+
+
     # Various formats
     formats = [
-        # 1996-12-19T16:39:57-0800
-        ("%Y-%m-%dT%H:%M:%S%z", 'ISO 8601 (Local)'),
         # Sun, 19 May 2002 15:21:36
-        ("%a, %d %b %Y %H:%M:%S %Z", 'RFC1123'),
+        ("%a, %d %b %Y %H:%M:%S %Z (%z)", 'RFC1123'),
         # 2018-W13
         ("%Y-W%W", 'Week of Year'),
         # 2018-W13-1
@@ -125,7 +139,7 @@ def alfred_items_for_value(value):
         ("%Y-%j", 'Day of Year'),
     ]
     for format, description in formats:
-        item_value = value.strftime(format)
+        item_value = localtime.strftime(format)
         results.append(alfred.Item(
             title=str(item_value),
             subtitle=description,
