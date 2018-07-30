@@ -121,6 +121,10 @@ def alfred_items_for_value(value):
         ("%Y-%m-%d %H:%M:%S", 'ISO 8601 Non-Standard'),
         # 2018-W13
         ("%Y-W%W", 'Week of Year'),
+        # 2018-W13-1
+        ("%Y-W%W-%w", 'Week of Year with Day'),
+        # 2018-211
+        ("%Y-%j", 'Day of Year'),
     ]
     for format, description in formats:
         item_value = value.strftime(format)
