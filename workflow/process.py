@@ -20,7 +20,7 @@ def parse_query_value(query_str):
     """ Return value for the query string """
     try:
         query_str = str(query_str).strip('"\' ')
-        match = re.match('(\+|\-)(\d+)([smhdMy])|now', query_str)
+        match = re.match('(\+|\-)(\d+)([smhdwMy])|now', query_str)
 
         if match is not None:
             if match.group(0) == 'now':
