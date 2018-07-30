@@ -99,16 +99,12 @@ def alfred_items_for_value(value):
 
     # Various formats
     formats = [
-        # 1937-01-01 12:00:27
-        ("%Y-%m-%d %H:%M:%S", ''),
-        # 19 May 2002 15:21:36
-        ("%d %b %Y %H:%M:%S", ''), 
         # Sun, 19 May 2002 15:21:36
-        ("%a, %d %b %Y %H:%M:%S", ''), 
-        # 1937-01-01T12:00:27
-        ("%Y-%m-%dT%H:%M:%S", ''),
+        ("%a, %d %b %Y %H:%M:%S %Z", 'RFC1123'),
         # 1996-12-19T16:39:57-0800
-        ("%Y-%m-%dT%H:%M:%S%z", ''),
+        ("%Y-%m-%dT%H:%M:%S%z", 'ISO 8601'),
+        # 1937-01-01 12:00:27
+        ("%Y-%m-%d %H:%M:%S", 'ISO 8601 Non-Standard'),
         # 2018-W13
         ("%Y-W%W", 'Week of Year'),
     ]
