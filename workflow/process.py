@@ -74,7 +74,7 @@ def alfred_items_for_value(value):
     results = []
 
     # First item as timestamp
-    item_value = calendar.timegm(value.datetime.utctimetuple())
+    item_value = calendar.timegm(value.utctimetuple())
     results.append(alfred.Item(
         title=str(item_value),
         subtitle=u'UTC Timestamp',
@@ -110,7 +110,7 @@ def alfred_items_for_value(value):
         ("%Y-W%W", 'Week of Year'),
     ]
     for format, description in formats:
-        item_value = value.datetime.strftime(format)
+        item_value = value.strftime(format)
         results.append(alfred.Item(
             title=str(item_value),
             subtitle=description,
