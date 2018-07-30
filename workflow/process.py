@@ -4,6 +4,7 @@ import re
 import operator
 import alfred
 import calendar
+from dateutil.tz import tzlocal
 from datetime import datetime
 from delorean import utcnow, parse, epoch
 
@@ -24,7 +25,7 @@ def parse_query_value(query_str):
 
         if match is not None:
             if match.group(0) == 'now':
-                d = utcnow()
+                d = datetime.now(tzlocal())
             else:
                 d = shift_time(match.group(1), match.group(2), match.group(3))
         else:
