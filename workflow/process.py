@@ -76,6 +76,8 @@ def alfred_items_for_value(value):
         ("%Y-%m-%dT%H:%M:%S", ''),
         # 1996-12-19T16:39:57-0800
         ("%Y-%m-%dT%H:%M:%S%z", ''),
+        # 2018-W13
+        ("%Y-W%W", 'Week of Year'),
     ]
     for format, description in formats:
         item_value = value.datetime.strftime(format)
