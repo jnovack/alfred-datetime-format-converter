@@ -75,38 +75,38 @@ def alfred_items_for_value(value):
     results = []
 
     # First item as timestamp
-    item_value = calendar.timegm(value.utctimetuple())
+    unixtime = calendar.timegm(value.utctimetuple())
     results.append(alfred.Item(
-        title=str(item_value),
+        title=str(unixtime),
         subtitle=u'UTC Timestamp',
         attributes={
             # 'uid': alfred.uid(index),
-            'arg': item_value,
+            'arg': unixtime,
         },
         icon='icon.png',
     ))
     index += 1
 
-    #Add support for UTC timestamps in millisecond format
+    # Add support for UTC timestamps in millisecond format // Warning: Millisecond precision is lost during conversion
     results.append(alfred.Item(
-        title=str(int(item_value)*int('1000')),
+        title=str(int(unixtime)*int('1000')),
         subtitle=u'UTC Timestamp (Milliseconds)',
         attributes={
             # 'uid': alfred.uid(index),
-            'arg': int(item_value)*int('1000'),
+            'arg': int(unixtime)*int('1000'),
         },
         icon='icon.png',
     ))
     index += 1
 
     # Add ISO 8601 UTC
-    item_value = utcnow().datetime.strftime("%Y-%m-%dT%H:%M:%SZ")
+    utctime = utcnow().datetime.strftime("%Y-%m-%dT%H:%M:%SZ")
     results.append(alfred.Item(
-        title=str(item_value),
+        title=str(utctime),
         subtitle='ISO 8601 (UTC)',
         attributes={
             # 'uid': alfred.uid(index),
-            'arg': item_value,
+            'arg': utctime,
         },
     icon='icon.png',
     ))
