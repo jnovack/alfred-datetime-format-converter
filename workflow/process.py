@@ -78,19 +78,19 @@ def alfred_items_for_value(value):
         title=str(item_value),
         subtitle=u'UTC Timestamp',
         attributes={
-            'uid': alfred.uid(index), 
+            'uid': alfred.uid(index),
             'arg': item_value,
         },
         icon='icon.png',
     ))
     index += 1
-    
+
     #Add support for UTC timestamps in millisecond format
     results.append(alfred.Item(
         title=str(int(item_value)*int('1000')),
         subtitle=u'UTC Timestamp (Milliseconds)',
         attributes={
-            'uid': alfred.uid(index), 
+            'uid': alfred.uid(index),
             'arg': int(item_value)*int('1000'),
         },
         icon='icon.png',
@@ -118,7 +118,7 @@ def alfred_items_for_value(value):
             title=str(item_value),
             subtitle=description,
             attributes={
-                'uid': alfred.uid(index), 
+                'uid': alfred.uid(index),
                 'arg': item_value,
             },
         icon='icon.png',
