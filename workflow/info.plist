@@ -68,7 +68,17 @@
 		</dict>
 	</array>
 	<key>readme</key>
-	<string>v0.2
+	<string>v0.3
+
+Displays the time in a variety of formats required/used by programming
+languages for easy conversion.
+
+Features:
+* Unix Timestamp In / Out (with milliseconds)
+* ISO 8601 in UTC and your timezone
+* RFC1123 in your timezone (Mon, 06 Aug 2018 08:56:07 EDT (-0400))
+* "Wikipedia" Formats (Week of Year, Week of Year with Day, Day of Year)
+* Remedial TimeShifting (+2h, +4w)
 
 This workflow uses these awesome Python projects:
 
