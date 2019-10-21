@@ -1,5 +1,4 @@
-alfred-datetime-format-converter
-================================
+# alfred-datetime-format-converter
 
 Alfred 4/3/2 workflow for converting between timestamps and formatted datetime strings with ease.
 
