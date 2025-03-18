@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>bundleid</key>
-	<string>com.michaelwaterfall.datetime-format-converter</string>
+	<string>com.jnovack.datetime-format-converter</string>
 	<key>connections</key>
 	<dict>
 		<key>E39428C3-EE89-4D16-836B-1D31A4974660</key>
@@ -19,7 +19,7 @@
 		</array>
 	</dict>
 	<key>createdby</key>
-	<string>Michael Waterfall</string>
+	<string>Justin J. Novack</string>
 	<key>description</key>
 	<string>Convert timestamps and datetime strings into various formats</string>
 	<key>disabled</key>
@@ -49,7 +49,7 @@
 				<key>escaping</key>
 				<integer>36</integer>
 				<key>keyword</key>
-				<string>df</string>
+				<string>date</string>
 				<key>script</key>
 				<string>python process.py "{query}"</string>
 				<key>subtext</key>
@@ -101,6 +101,6 @@ https://github.com/nikipore/alfred-python</string>
 		</dict>
 	</dict>
 	<key>webaddress</key>
-	<string>twitter.com/mwaterfall</string>
+	<string>https://github.com/jnovack/alfred-datetime-format-converter</string>
 </dict>
 </plist>
