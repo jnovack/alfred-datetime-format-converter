@@ -17,18 +17,19 @@ UNESCAPE_CHARACTERS = u""" ;()"""
 
 _MAX_RESULTS_DEFAULT = 9
 
-preferences = plistlib.readPlist('info.plist')
+with open(os.path.join(os.path.dirname(__file__), 'info.plist'), 'rb') as plist_fp:
+    preferences = plistlib.load(plist_fp)
 bundleid = preferences['bundleid']
 
 class Item(object):
     @classmethod
-    def unicode(cls, value):
+    def to_text(cls, value):
         try:
-            items = value.iteritems()
+            items = value.items()
         except AttributeError:
-            return unicode(value)
+            return str(value)
         else:
-            return dict(map(unicode, item) for item in items)
+            return {str(k): str(v) for (k, v) in items}
 
     def __init__(self, attributes, title, subtitle, icon=None):
         self.attributes = attributes
@@ -37,19 +38,19 @@ class Item(object):
         self.icon = icon
 
     def __str__(self):
-        return tostring(self.xml(), encoding='utf-8')
+        return tostring(self.xml(), encoding='unicode')
 
     def xml(self):
-        item = Element(u'item', self.unicode(self.attributes))
-        for attribute in (u'title', u'subtitle', u'icon'):
+        item = Element('item', self.to_text(self.attributes))
+        for attribute in ('title', 'subtitle', 'icon'):
             value = getattr(self, attribute)
             if value is None:
                 continue
             try:
                 (value, attributes) = value
-            except:
+            except Exception:
                 attributes = {}
-            SubElement(item, attribute, self.unicode(attributes)).text = unicode(value)
+            SubElement(item, attribute, self.to_text(attributes)).text = str(value)
         return item
 
 def args(characters=None):
@@ -59,10 +60,12 @@ def config():
     return _create('config')
 
 def decode(s):
-    return unicodedata.normalize('NFC', s.decode('utf-8'))
+    if isinstance(s, bytes):
+        s = s.decode('utf-8')
+    return unicodedata.normalize('NFC', s)
 
 def uid(uid):
-    return u'-'.join(map(unicode, (bundleid, uid)))
+    return '-'.join(map(str, (bundleid, uid)))
 
 def unescape(query, characters=None):
     for character in (UNESCAPE_CHARACTERS if (characters is None) else characters):
@@ -70,13 +73,16 @@ def unescape(query, characters=None):
     return query
 
 def work(volatile):
-    path = {
-        True: '~/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data',
-        False: '~/Library/Application Support/Alfred 2/Workflow Data'
-    }[bool(volatile)]
-    return _create(os.path.join(os.path.expanduser(path), bundleid))
+    var_name = 'alfred_workflow_cache' if bool(volatile) else 'alfred_workflow_data'
+    path = os.getenv(var_name)
+    if not path:
+        raise RuntimeError('Missing Alfred workflow path env var: %s' % var_name)
+    return _create(path)
 
 def write(text):
+    if isinstance(text, bytes):
+        sys.stdout.buffer.write(text)
+        return
     sys.stdout.write(text)
 
 def xml(items, maxresults=_MAX_RESULTS_DEFAULT):
@@ -87,7 +93,7 @@ def xml(items, maxresults=_MAX_RESULTS_DEFAULT):
 
 def _create(path):
     if not os.path.isdir(path):
-        os.mkdir(path)
+        os.makedirs(path)
     if not os.access(path, os.W_OK):
         raise IOError('No write access: %s' % path)
     return path

@@ -4,10 +4,11 @@ import re
 import operator
 import alfred
 import calendar
-import time
 from dateutil.tz import tzlocal
+from dateutil.parser import parse as parse_datetime
 from datetime import datetime
-from delorean import utcnow, parse, epoch
+from datetime import timedelta
+from datetime import timezone
 
 def process(query_str):
     """ Entry point """
@@ -21,23 +22,34 @@ def process(query_str):
 def parse_query_value(query_str):
     """ Return value for the query string """
     try:
-        query_str = str(query_str).strip('"\' ')
-        match = re.match('(\+|\-)(\d+)([smhdwMy])|now', query_str)
+        query_str = str(query_str or '').strip('"\' ').strip()
+        if not query_str:
+            query_str = 'now'
+
+        match = re.match(r'^(\+|\-)(\d+)([smhdwMy])$|^now$', query_str, re.IGNORECASE)
 
         if match is not None:
-            if match.group(0) == 'now':
+            if query_str.lower() == 'now':
                 d = datetime.now(tzlocal())
             else:
                 d = shift_time(match.group(1), match.group(2), match.group(3))
         else:
-            # Parse datetime string or timestamp
+            # Parse numeric timestamp input first (seconds, fractional seconds, or milliseconds)
             try:
-                if query_str.isdigit() and len(query_str) == 13:
-                    query_str = query_str[:10] + '.' + query_str[10:]
-                d = epoch(float(query_str)).datetime
-            except ValueError:
-                d = parse(str(query_str))
-    except (TypeError, ValueError):
+                if re.match(r'^\d{13}$', query_str):
+                    ts_value = float(query_str) / 1000.0
+                elif re.match(r'^-?\d+(\.\d+)?$', query_str):
+                    ts_value = float(query_str)
+                else:
+                    raise ValueError('not a numeric timestamp')
+                d = datetime.fromtimestamp(ts_value, timezone.utc).astimezone(tzlocal())
+            except (ValueError, OverflowError):
+                d = parse_datetime(query_str)
+                if d.tzinfo is None:
+                    d = d.replace(tzinfo=tzlocal())
+                else:
+                    d = d.astimezone(tzlocal())
+    except (TypeError, ValueError, OverflowError):
         d = None
     return d
 
@@ -59,11 +71,11 @@ def shift_time(op, value, measure):
     elif measure == 'y':
         multiplier = ((60*60)*24)*365
 
-    # Convert our value + measure to seconds
+    # Convert value + measure to seconds and apply to current UTC time.
     seconds = multiplier * int(value)
-    current_ts = calendar.timegm(datetime.now().timetuple())
-
-    return epoch(op_map[op](current_ts, seconds))
+    current_utc = datetime.now(timezone.utc)
+    shifted_utc = current_utc + timedelta(seconds=op_map[op](0, seconds))
+    return shifted_utc.astimezone(tzlocal())
 
 def alfred_items_for_value(value):
     """
@@ -74,8 +86,14 @@ def alfred_items_for_value(value):
     index = 0
     results = []
 
-    # First item as timestamp
-    unixtime = calendar.timegm(value.utctimetuple())
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=tzlocal())
+
+    localtime = value.astimezone(tzlocal())
+    utctime = localtime.astimezone(timezone.utc)
+
+    # First item as timestamp (UTC seconds)
+    unixtime = calendar.timegm(utctime.utctimetuple())
     results.append(alfred.Item(
         title=str(unixtime),
         subtitle=u'UTC Timestamp',
@@ -100,21 +118,19 @@ def alfred_items_for_value(value):
     index += 1
 
     # Add ISO 8601 UTC
-    utctime = utcnow().datetime.strftime("%Y-%m-%dT%H:%M:%SZ")
+    utc_iso = utctime.strftime("%Y-%m-%dT%H:%M:%SZ")
     results.append(alfred.Item(
-        title=str(utctime),
+        title=str(utc_iso),
         subtitle='ISO 8601 (UTC)',
         attributes={
             # 'uid': alfred.uid(index),
-            'arg': utctime,
+            'arg': utc_iso,
         },
     icon='icon.png',
     ))
     index += 1
 
-    # Local Time Hack
-    almost_time = datetime.fromtimestamp(unixtime)
-    localtime = almost_time.replace(tzinfo=tzlocal())
+    # ISO 8601 local
     item_value = localtime.strftime("%Y-%m-%dT%H:%M:%S%z")
     results.append(alfred.Item(
         title=str(item_value),
@@ -157,5 +173,5 @@ if __name__ == "__main__":
     try:
         query_str = alfred.args()[0]
     except IndexError:
-        query_str = None
+        query_str = 'now'
     process(query_str)

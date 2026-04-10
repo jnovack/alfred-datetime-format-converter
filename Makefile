@@ -1,4 +1,10 @@
+.PHONY: build clean release-local
 
-zip:
-	rm -rf download/DatetimeFormatConverter.alfredworkflow
-	cd workflow; zip -r ../download/DatetimeFormatConverter.alfredworkflow *
+build: clean
+	./scripts/build-workflow.sh
+
+clean:
+	rm -rf dist
+
+install:
+	open dist/DatetimeFormatConverter.alfredworkflow

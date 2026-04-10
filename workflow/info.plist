@@ -26,6 +26,8 @@
 	<false/>
 	<key>name</key>
 	<string>Datetime Format Converter</string>
+	<key>version</key>
+	<string>5.0.0</string>
 	<key>objects</key>
 	<array>
 		<dict>
@@ -45,13 +47,13 @@
 			<key>config</key>
 			<dict>
 				<key>argumenttype</key>
-				<integer>0</integer>
+				<integer>2</integer>
 				<key>escaping</key>
 				<integer>36</integer>
 				<key>keyword</key>
 				<string>date</string>
 				<key>script</key>
-				<string>python process.py "{query}"</string>
+				<string>/usr/bin/python3 process.py "{query}"</string>
 				<key>subtext</key>
 				<string>Examples: 1364302555, 2013-01-15 19:41:06, now</string>
 				<key>title</key>
@@ -59,7 +61,7 @@
 				<key>type</key>
 				<integer>0</integer>
 				<key>withspace</key>
-				<true/>
+				<false/>
 			</dict>
 			<key>type</key>
 			<string>alfred.workflow.input.scriptfilter</string>
@@ -68,7 +70,7 @@
 		</dict>
 	</array>
 	<key>readme</key>
-	<string>v0.3
+	<string>v5.0.0-
 
 Displays the time in a variety of formats required/used by programming
 languages for easy conversion.
